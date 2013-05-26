@@ -1,0 +1,5 @@
+CONSUMER_KEY: "your consumerkey"
+CONSUMER_SECRET: "consumer secret"
+ACCESS_TOKEN: "token"
+ACCESS_TOKEN_SECRET: "token secret"
+

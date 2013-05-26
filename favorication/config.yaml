@@ -1,0 +1,6 @@
+# twitter config
+consumer_key: "your consumer key"
+consumer_secret: "consumer secret"
+access_token: "token"
+access_token_secret: "token secret"
+

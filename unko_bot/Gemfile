@@ -1,0 +1,5 @@
+source :rubygems
+gem 'userstream'
+gem 'twitter'
+gem 'oauth'
+gem 'json'
