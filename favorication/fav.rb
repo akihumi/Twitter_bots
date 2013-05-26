@@ -15,12 +15,13 @@ CONSUMER_SECRET = config["consumer_secret"]
 ACCESS_TOKEN = config["access_token"]
 ACCESS_TOKEN_SECRET = config["access_token_secret"]
 
-Twitter.configure do |config|
-  config.consumer_key = CONSUMER_KEY
-  config.consumer_secret = CONSUMER_SECRET
-  config.oauth_token = ACCESS_TOKEN
-  config.oauth_token_secret = ACCESS_TOKEN_SECRET
-end
+@client = Twitter::Client.new(
+  :consumer_key => CONSUMER_KEY,
+  :consumer_secret => CONSUMER_SECRET,
+  :oauth_token => ACCESS_TOKEN,
+  :oauth_token_secret => ACCESS_TOKEN_SECRET
+)
+
 consumer = OAuth::Consumer.new(
   CONSUMER_KEY,
   CONSUMER_SECRET,
@@ -44,7 +45,7 @@ https.verify_depth = 5
 # 相手のツイートの先頭5件をとってきてふぁぼる
 # すでにふぁぼっていたらさかのぼって5件とってきてふぁぼる
 def counttweet(count, user)
-  tweet = Twitter.user_timeline(user, :count => count)
+  tweet = @client.user_timeline(user, :count => count)
   favo = true
   puts count
   unless tweet.length == 0 then
@@ -53,7 +54,7 @@ def counttweet(count, user)
         favo = true
       else
         begin
-          Twitter.favorite(t['id']) unless t['favorited']
+          @client.favorite(t['id']) unless t['favorited']
         rescue Twitter::Error::Forbidden
           puts "already favo"
         end
@@ -85,7 +86,7 @@ https.start do |https|
           user = status['source']
           if (status['event'] == "favorite") && !(user['screen_name'] == "akihumi2") then
             puts "#{user['screen_name']} is favorited My tweet."
-            counttweet(5, user['screen_name']) unless Twitter.block?(user['id'])
+            counttweet(5, user['screen_name']) unless @client.block?(user['id'])
           end
         end
       end
