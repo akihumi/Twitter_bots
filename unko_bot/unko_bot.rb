@@ -8,7 +8,7 @@ require './lib/streamline'
 
 # get "itcollege" list members
 @listmembers = []
-config = YAML.load_file("config.yaml")
+config = YAML.load_file("oauth.yaml")
 @client = Twitter::Client.new(
   :consumer_key => config["consumer_key"],
   :consumer_secret => config["consumer_secret"],
@@ -33,9 +33,9 @@ end
 
 # keywordをつぶやいているか
 def search_unko(text)
-  keyword = ["うんこ","うんち","うん○","う○こ","○んこ","う○ち","○んち","うんo","oんこ","うoこ","うoち","うoち","うんx","うxこ","xんこ","うxち","xんち","糞","う◯こ","う◯ち","◯んこ","◯んち","うん◯","うん●","う●こ","う●ち","●んこ","●んち", "うんk"]
+  keyword = ["うんこ","うんち","うん○","う○こ","○んこ","う○ち","○んち","うんo","oんこ","うoこ","うoち","うoち","うんx","うxこ","xんこ","うxち","xんち","糞","う◯こ","う◯ち","◯んこ","◯んち","うん◯","うん●","う●こ","う●ち","●んこ","●んち", "うんk","・・ー ・ー・ー・ ーーーー","uんこ"]
   keyword.each do |w|
-    if text.include?(w) then
+    if text.include?(w) || text.reverse.include?(w) then
       yield if block_given?
       puts "text included #{w}"
     end
@@ -45,12 +45,15 @@ end
 @client.list_members("akihumi2", "itcollege").each do |list|
   @listmembers.push list.attrs[:screen_name] unless list.nil?
 end
+
+# @listmembers.push "_humin"
 https = Streamline.new(config["consumer_key"], config["consumer_secret"], config["oauth_token"], config["oauth_token_secret"])
 https.start do
   user = https.status['user']
   # itcollegeリストに入ってる人のつぶやきに反応
   search_user(user) do
-    text =  kata2hira(https.status['text']).gsub(/(\s|　|\.|\/|,|、|。|;|\[|\]|\{|\}|'|\_|\?|\"|\!|\*|\-|\|)+/, '').downcase
+    text =  kata2hira(https.status['text']).gsub(/(\s|　|\.|\/|,|、|。|;|\[|\]|\{|\}|'|\_|\?|\"|\!|\*|\-|\|-|ー|・|\w|「|」)+/, '').downcase
+    text = text.split(//).uniq.join("")
     search_unko(text) do
       begin
         @client.favorite(https.status['id']) unless https.status['favorited']
